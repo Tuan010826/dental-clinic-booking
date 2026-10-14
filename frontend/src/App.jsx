@@ -1,77 +1,58 @@
-import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 
-// 1. Tạo Nhanh các Trang (Sau này bạn tách ra từng file riêng cho gọn)
-const HomePage = () => (
-  <div>
-    <h1>🦷 Trang chủ Phòng khám</h1>
-    <p>Chào mừng bạn! Dưới đây là danh sách Dịch vụ và Bác sĩ...</p>
-    <Link to="/login"><button>Đăng nhập / Đăng ký</button></Link>
+// === IMPORT CÁC TRANG CỦA KHÁCH & BỆNH NHÂN (Bạn đã làm) ===
+import MainLayout from './components/MainLayout';
+import { HomePage, DoctorListPage, ServicesPage, GuidePage, PatientPage } from './pages/StaticPages';
+
+// === IMPORT CÁC TRANG XÁC THỰC ===
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+
+// === KHUNG GIỮ CHỖ CHO ADMIN & BÁC SĨ (Đồng đội sẽ làm và thay thế sau) ===
+// (Lưu ý: Các hàm dưới đây chỉ là giữ chỗ tạm thời để code không bị lỗi. 
+// Sau này đồng đội của bạn sẽ xóa chúng đi và import các file .jsx thật của họ vào đây)
+const AdminLayout = ({ children }) => (
+  <div style={{ backgroundColor: '#2c3e50', minHeight: '100vh', color: 'white', padding: '20px' }}>
+    <h2 style={{ borderBottom: '1px solid white', paddingBottom: '10px' }}>⚙️ ĐÂY LÀ GIAO DIỆN ADMIN LAYOUT CHUNG</h2>
+    {/* Outlet sẽ được thay thế sau, tạm thời render children */}
+    <div style={{ marginTop: '20px' }}>{children}</div>
   </div>
 );
+const AdminDashboard = () => <h3>📊 Trang Tổng quan Dashboard (Đồng đội code ở đây)</h3>;
+const DoctorSchedule = () => <h3>📅 Trang Quản lý Lịch Khám (Đồng đội code ở đây)</h3>;
 
-const AdminDoctorPage = () => <h2>Trang Quản trị dành cho Admin & Bác sĩ 👨‍⚕️</h2>;
-const PatientBookingPage = () => <h2>Trang Đặt lịch dành cho Bệnh nhân 📅</h2>;
 
-// 2. Trang Đăng nhập & Logic bẻ lái
-const LoginPage = () => {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      // Gọi API Đăng nhập bạn đã viết ở Backend
-      const response = await fetch('http://localhost:3000/api/v1/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      
-      const data = await response.json();
-
-      if (response.ok) {
-        alert(data.message);
-        
-        // CHÌA KHÓA NẰM Ở ĐÂY: Dựa vào role_id để bẻ lái
-        if (data.data.role_id === 1 || data.data.role_id === 2) {
-          navigate('/admin'); // Admin & Bác sĩ vào đây
-        } else if (data.data.role_id === 3) {
-          navigate('/patient'); // Bệnh nhân vào đây
-        }
-      } else {
-        alert(data.message); // Báo lỗi sai mật khẩu, sai email...
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  return (
-    <div>
-      <h2>Đăng nhập</h2>
-      <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', width: '300px', gap: '10px' }}>
-        <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
-        <input type="password" placeholder="Mật khẩu" value={password} onChange={e => setPassword(e.target.value)} required />
-        <button type="submit">Đăng nhập</button>
-      </form>
-    </div>
-  );
-};
-
-// 3. Cấu hình các đường dẫn (Routes) của dự án
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
         
-        {/* Các trang dành cho 2 bạn kia code */}
-        <Route path="/admin" element={<AdminDoctorPage />} />
-        <Route path="/patient" element={<PatientBookingPage />} />
+        {/* ======================================= */}
+        {/* VÙNG 1: TRANG DÀNH CHO KHÁCH VÀ BỆNH NHÂN */}
+        {/* ======================================= */}
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/doctors" element={<DoctorListPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/guide" element={<GuidePage />} />
+          {/* Trang của Bệnh nhân nằm chung Layout với Khách để xài chung Nav/Footer */}
+          <Route path="/patient" element={<PatientPage />} />
+        </Route>
+
+        {/* ======================================= */}
+        {/* VÙNG 2: TRANG ĐỘC LẬP (KHÔNG CÓ HEADER/FOOTER) */}
+        {/* ======================================= */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+
+        {/* ======================================= */}
+        {/* VÙNG 3: TRANG DÀNH CHO ADMIN & BÁC SĨ */}
+        {/* ======================================= */}
+        {/* Đồng đội sẽ cấu hình Outlet trong AdminLayout thật của họ sau */}
+        <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
+        <Route path="/admin/schedule" element={<AdminLayout><DoctorSchedule /></AdminLayout>} />
+
       </Routes>
     </BrowserRouter>
   );
