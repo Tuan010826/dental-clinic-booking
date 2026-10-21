@@ -13,5 +13,8 @@ const initAPIRoutes = (app) => {
     // Tiền tố chung cho tất cả API sẽ là /api/v1
     return app.use('/api/v1', router);
 };
+const { getDoctors } = require('../controllers/userController');
+
+router.get('/doctors', getDoctors); 
 
 module.exports = initAPIRoutes;

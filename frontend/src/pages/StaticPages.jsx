@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-// Màu xanh chủ đạo dùng chung cho toàn bộ các trang này
 const primaryColor = '#2980b9'; 
 
 // =========================================
 // 1. TRANG CHỦ (/)
 // =========================================
 export const HomePage = () => {
+  // KIỂM TRA ĐĂNG NHẬP: Đọc dữ liệu từ localStorage
+  const user = localStorage.getItem('user');
+  // Nếu có user -> đi tới /patient. Nếu không -> đi tới /login
+  const bookingLink = user ? '/patient' : '/login';
+
   return (
     <div style={{ fontFamily: 'sans-serif' }}>
       {/* HERO BANNER */}
@@ -16,7 +20,8 @@ export const HomePage = () => {
         <p style={{ color: '#7f8c8d', fontSize: '18px', maxWidth: '600px', margin: '0 auto 30px' }}>
           Phòng khám Nha Khoa Smile ứng dụng công nghệ hiện đại, đội ngũ bác sĩ tận tâm, mang đến cho bạn hàm răng khỏe đẹp hoàn hảo.
         </p>
-        <Link to="/login">
+        {/* Đã thay to="/login" thành to={bookingLink} */}
+        <Link to={bookingLink}>
           <button style={{ padding: '15px 30px', backgroundColor: '#e74c3c', color: 'white', border: 'none', borderRadius: '30px', fontWeight: 'bold', fontSize: '18px', cursor: 'pointer', boxShadow: '0 4px 6px rgba(231, 76, 60, 0.3)' }}>
             📅 ĐẶT LỊCH KHÁM NGAY
           </button>
@@ -53,28 +58,23 @@ export const HomePage = () => {
 // =========================================
 export const DoctorListPage = () => {
   const [doctors, setDoctors] = useState([]);
+  const primaryColor = '#2980b9';
 
+  // Gọi API lấy dữ liệu từ Database ngay khi mở trang
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/v1/users?role_id=2');
-        if (response.ok) {
-          const data = await response.json();
-          if (data.data && data.data.length > 0) {
-            setDoctors(data.data);
-          }
+        const response = await fetch('http://localhost:3000/api/v1/doctors');
+        const result = await response.json();
+        if (result.success) {
+          setDoctors(result.data); // Lưu dữ liệu từ MySQL vào state
         }
       } catch (error) {
-        console.error("Chưa kết nối được API bác sĩ:", error);
+        console.error("Lỗi khi kết nối API bác sĩ:", error);
       }
     };
     fetchDoctors();
   }, []);
-
-  const displayDoctors = doctors.length > 0 ? doctors : [
-    { id: 1, full_name: "BS. CKI Trần Văn B", email: "bacsi@gmail.com", phone: "0988.888.888", avatar: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=300&h=400&fit=crop" },
-    { id: 2, full_name: "ThS. BS. Nguyễn Thị C", email: "nguyenthic@gmail.com", phone: "0977.777.777", avatar: "https://images.unsplash.com/photo-1594824453531-157d60ce1482?q=80&w=300&h=400&fit=crop" }
-  ];
 
   return (
     <section style={{ backgroundColor: '#ffffff', padding: '60px 20px', textAlign: 'center', fontFamily: 'sans-serif' }}>
@@ -82,24 +82,56 @@ export const DoctorListPage = () => {
       <p style={{ color: '#7f8c8d', marginBottom: '40px' }}>Các chuyên gia nha khoa hàng đầu luôn sẵn sàng chăm sóc bạn.</p>
       
       <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '25px' }}>
-        {displayDoctors.map((doc) => (
+        {doctors.map((doc) => (
           <div key={doc.id} style={{ display: 'flex', backgroundColor: '#f8f9fa', borderRadius: '12px', overflow: 'hidden', border: '1px solid #eaeaea', textAlign: 'left' }}>
-            <img src={doc.avatar || "https://via.placeholder.com/250x300.png?text=No+Avatar"} alt={doc.full_name} style={{ width: '220px', minHeight: '260px', objectFit: 'cover' }} />
-            <div style={{ padding: '30px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <h3 style={{ color: '#1a365d', fontSize: '22px', marginBottom: '20px', fontWeight: 'bold' }}>{doc.full_name}</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', color: '#4a5568', fontSize: '15px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ color: primaryColor }}>⭐</span> <span>Chuyên khoa Răng Hàm Mặt</span></div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ color: primaryColor }}>📍</span> <span>Phòng khám A9-2307</span></div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ color: primaryColor }}>📞</span> <span>{doc.phone || 'Đang cập nhật'}</span></div>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ color: primaryColor }}>🎓</span> <span>Chứng chỉ Phục hình thẩm mỹ</span></div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ color: primaryColor }}>🏥</span> <span>Hơn 10 năm kinh nghiệm</span></div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ color: primaryColor }}>✉️</span> <span>{doc.email}</span></div>
+            
+            {/* Ảnh bác sĩ từ Database */}
+            <img 
+              src={doc.avatar} 
+              alt={doc.full_name} 
+              onError={(e) => { 
+                e.target.onerror = null; 
+                // Tự động thế chỗ bằng ảnh một nữ bác sĩ cực nét nếu link trong DB bị chết
+                e.target.src = "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=300&h=400"; 
+              }}
+              style={{ width: '220px', minHeight: '260px', objectFit: 'cover' }} 
+            />
+            
+            {/* Thông tin bác sĩ từ Database */}
+            <div style={{ padding: '30px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <h3 style={{ color: '#1a365d', fontSize: '22px', marginBottom: '5px', fontWeight: 'bold' }}>
+                  {doc.position} {doc.full_name}
+                </h3>
+                <p style={{ color: '#7f8c8d', fontSize: '14px', marginBottom: '20px', fontStyle: 'italic' }}>
+                  "{doc.description}"
+                </p>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', color: '#4a5568', fontSize: '15px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ color: primaryColor }}>⭐</span> <span>{doc.specialty_name}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ color: primaryColor }}>📞</span> <span>{doc.phone}</span>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ color: primaryColor }}>💰</span> 
+                      <span style={{ fontWeight: 'bold', color: '#e74c3c' }}>
+                        Khám: {Number(doc.price).toLocaleString('vi-VN')} VNĐ
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ color: primaryColor }}>✉️</span> <span>{doc.email}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+
           </div>
         ))}
       </div>
@@ -111,6 +143,10 @@ export const DoctorListPage = () => {
 // 3. TRANG DỊCH VỤ (/services)
 // =========================================
 export const ServicesPage = () => {
+  // KIỂM TRA ĐĂNG NHẬP
+  const user = localStorage.getItem('user');
+  const bookingLink = user ? '/patient' : '/login';
+
   const services = [
     { icon: "🩺", title: "Khám Tổng Quát", desc: "Kiểm tra toàn diện sức khỏe răng miệng, lấy cao răng định kỳ bằng sóng siêu âm êm ái." },
     { icon: "💎", title: "Bọc Răng Sứ Thẩm Mỹ", desc: "Phục hình răng khiếm khuyết với đa dạng các dòng sứ cao cấp: Cercon, Zirconia, Emax..." },
@@ -131,7 +167,9 @@ export const ServicesPage = () => {
             <div style={{ fontSize: '50px', marginBottom: '20px' }}>{srv.icon}</div>
             <h3 style={{ color: '#2c3e50', fontSize: '20px', marginBottom: '15px' }}>{srv.title}</h3>
             <p style={{ color: '#7f8c8d', fontSize: '15px', lineHeight: '1.6', marginBottom: '25px' }}>{srv.desc}</p>
-            <Link to="/login" style={{ textDecoration: 'none' }}>
+            
+            {/* Đã thay to="/login" thành to={bookingLink} */}
+            <Link to={bookingLink} style={{ textDecoration: 'none' }}>
               <span style={{ color: primaryColor, fontWeight: 'bold', fontSize: '14px', padding: '8px 15px', border: `2px solid ${primaryColor}`, borderRadius: '20px' }}>
                 ĐẶT LỊCH NGAY
               </span>
