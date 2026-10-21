@@ -1,0 +1,15 @@
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+  background-color: #f8f9fa; /* Màu nền xám cực nhạt cho trang web y tế */
+}
+
+a {
+  text-decoration: none;
+}
