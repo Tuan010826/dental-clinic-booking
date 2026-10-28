@@ -13,10 +13,10 @@ export const HomePage = () => {
   const bookingLink = user ? '/patient' : '/login';
 
   return (
-    <div style={{ fontFamily: 'sans-serif' }}>
+    <div>
       {/* HERO BANNER */}
       <section style={{ backgroundColor: '#eaf4fc', padding: '80px 20px', textAlign: 'center', borderBottom: '1px solid #e0e0e0' }}>
-        <h1 style={{ color: '#2c3e50', fontSize: '42px', marginBottom: '20px', fontWeight: '800' }}>Tỏa sáng nụ cười tự tin</h1>
+        <h1 style={{ color: '#2c3e50', fontSize: '42px', marginBottom: '20px', fontWeight: 'bold' }}>Tỏa sáng nụ cười tự tin</h1>
         <p style={{ color: '#7f8c8d', fontSize: '18px', maxWidth: '600px', margin: '0 auto 30px' }}>
           Phòng khám Nha Khoa Smile ứng dụng công nghệ hiện đại, đội ngũ bác sĩ tận tâm, mang đến cho bạn hàm răng khỏe đẹp hoàn hảo.
         </p>

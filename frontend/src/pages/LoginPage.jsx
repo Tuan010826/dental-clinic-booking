@@ -1,95 +1,122 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 
-// --- TRANG ĐĂNG NHẬP ---
 const LoginPage = () => {
-  const navigate = useNavigate();
-  // Giữ nguyên tên biến email để gửi cho backend, dù nó có thể chứa số điện thoại
-  const [email, setEmail] = useState(''); 
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
-  const [showPassword, setShowPassword] = useState(false);
+  // 1. THÊM STATE ĐỂ LƯU THÔNG BÁO LỖI
+  const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage(''); // Xóa lỗi cũ trước khi gửi yêu cầu mới
+
+    // Kiểm tra định dạng email thủ công
+    if (!email.includes('@') || !email.endsWith('gmail.com')) {
+      setErrorMessage('Email sai hoặc chưa được đăng ký!');
+      setTimeout(() => setErrorMessage(''), 2500);
+      return; // Dừng lại, không gọi API
+    }
+
     try {
       const response = await fetch('http://localhost:3000/api/v1/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }) 
+        body: JSON.stringify({ email, password }),
       });
+
       const data = await response.json();
 
+      // SỬA LẠI ĐIỀU KIỆN: Chỉ cần response.ok (mã 200-299) là đủ xác nhận thành công
       if (response.ok) {
-        // LƯU THÔNG TIN NGƯỜI DÙNG VÀO BỘ NHỚ TRÌNH DUYỆT
-        localStorage.setItem('user', JSON.stringify(data.data));
-
-        if (data.data.role_id === 1 || data.data.role_id === 2) {
-          navigate('/admin'); // Admin/Bác sĩ vẫn vào trang quản trị
-        } else if (data.data.role_id === 3) {
-          navigate('/'); // Bệnh nhân được đưa về lại Trang chủ
-        }
+        // Trích xuất đúng object chứa thông tin người dùng từ Backend trả về
+        const userInfo = data.user || data.data || data;
+        // Lưu thông tin user (lấy data.user hoặc lấy toàn bộ data tùy cấu trúc Backend)
+        localStorage.setItem('user', JSON.stringify(data.user || data)); 
+        
+        // Điều hướng thẳng về trang chủ (hoặc đổi thành '/patient' tùy ý bạn)
+        navigate('/'); 
       } else {
-        alert(data.message);
+        // Xử lý nhánh lỗi thực sự
+        setErrorMessage(data.message || 'Email hoặc mật khẩu không chính xác!');
+        setTimeout(() => setErrorMessage(''), 2500);
       }
     } catch (error) {
-      console.error("Lỗi:", error);
+      console.error('Lỗi kết nối:', error);
+      setErrorMessage('Không thể kết nối đến máy chủ. Vui lòng thử lại sau!');
+      setTimeout(() => setErrorMessage(''), 2500);
     }
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '60px', fontFamily: 'sans-serif' }}>
-      <h2 style={{ color: '#3498db', marginBottom: '20px' }}>Đăng nhập vào Phòng khám</h2>
-      
-      <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', width: '320px', gap: '12px' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh', backgroundColor: '#f5f7fa', fontFamily: "'Times New Roman', Times, serif" }}>
+      <div style={{ backgroundColor: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', width: '100%', maxWidth: '400px' }}>
         
-        {/* Đã sửa type="email" thành type="text" để cho phép nhập cả sđt và không bị trình duyệt báo lỗi */}
-        <input 
-          type="text" 
-          placeholder="Email hoặc số điện thoại" 
-          value={email} 
-          onChange={e => setEmail(e.target.value)} 
-          required 
-          style={{ padding: '10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box' }}
-        />
-        
-        {/* Khối bọc ô mật khẩu */}
-        <div style={{ position: 'relative', width: '100%' }}>
-          <input 
-            type={showPassword ? "text" : "password"} 
-            placeholder="Mật khẩu" 
-            value={password} 
-            onChange={e => setPassword(e.target.value)} 
-            required 
-            style={{ padding: '10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '14px', width: '100%', boxSizing: 'border-box' }}
-          />
-          <span 
-            onClick={() => setShowPassword(!showPassword)}
-            style={{ position: 'absolute', right: '10px', top: '10px', cursor: 'pointer', userSelect: 'none' }}
-            title={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+        <h2 style={{ textAlign: 'center', color: '#1a365d', marginBottom: '25px', fontWeight: 'bold' }}>
+          Đăng Nhập Tài Khoản
+        </h2>
+
+        {/* 3. KHUNG HIỂN THỊ THÔNG BÁO LỖI MÀU ĐỎ (CHỈ HIỆN KHU CÓ LỖI) */}
+        {errorMessage && (
+          <div style={{
+            backgroundColor: '#fde8e8',
+            color: '#e74c3c',
+            padding: '12px 15px',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            border: '1px solid #f8b4b4',
+            fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <span>⚠️</span>
+            <span>{errorMessage}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} noValidate>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#4a5568' }}>
+              Email
+            </label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Nhập email của bạn..."
+              style={{ width: '100%', padding: '12px', borderRadius: '6px', border: '1px solid #cbd5e0', fontSize: '15px', boxSizing: 'border-box' }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '25px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#4a5568' }}>
+              Mật khẩu
+            </label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Nhập mật khẩu..."
+              style={{ width: '100%', padding: '12px', borderRadius: '6px', border: '1px solid #cbd5e0', fontSize: '15px', boxSizing: 'border-box' }}
+            />
+          </div>
+
+          <button
+            type="submit"
+            style={{ width: '100%', padding: '12px', backgroundColor: '#2980b9', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer', transition: 'background-color 0.2s' }}
           >
-            {showPassword ? '🙉' : '🙈'}
-          </span>
+            Đăng nhập
+          </button>
+        </form>
+
+        <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '14px', color: '#7f8c8d' }}>
+          Chưa có tài khoản? <Link to="/register" style={{ color: '#2980b9', textDecoration: 'none', fontWeight: 'bold' }}>Đăng ký ngay</Link>
         </div>
-        
-        <button type="submit" 
-                style={{ padding: '12px', backgroundColor: '#3498db', color: 'white', border: 'none', fontWeight: 'bold', cursor: 'pointer', borderRadius: '4px', marginTop: '5px' }}>
-          Đăng nhập
-        </button>
-      </form>
-
-      <div style={{ marginTop: '15px', color: '#3498db', cursor: 'pointer', fontSize: '13px' }}>
-        Quên mật khẩu?
       </div>
-
-      <hr style={{ width: '320px', margin: '25px 0', border: '0.5px solid #eaeaea' }} />
-
-      <button 
-        onClick={() => navigate('/register')} 
-        style={{ padding: '12px 20px', backgroundColor: '#2ecc71', color: 'white', border: 'none', fontWeight: 'bold', cursor: 'pointer', borderRadius: '4px' }}
-      >
-        Tạo tài khoản mới
-      </button>
     </div>
   );
 };

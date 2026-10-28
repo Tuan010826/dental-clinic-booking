@@ -5,30 +5,36 @@ const MainLayout = () => {
   const primaryColor = '#2980b9'; 
   const navigate = useNavigate();
   
-  // Biến lưu trạng thái người dùng
   const [user, setUser] = useState(null);
 
-  // Kiểm tra xem có ai đang đăng nhập không mỗi khi Layout được tải
   useEffect(() => {
-    const loggedInUser = localStorage.getItem('user');
-    if (loggedInUser) {
-      setUser(JSON.parse(loggedInUser));
+    try {
+      const loggedInUser = localStorage.getItem('user');
+      if (loggedInUser) {
+        const parsed = JSON.parse(loggedInUser);
+        // Trích xuất lấy đúng phần lõi chứa thông tin user (parsed.data)
+        setUser(parsed.data || parsed.user || parsed);
+      }
+    } catch (error) {
+      console.error("Lỗi đọc dữ liệu người dùng:", error);
+      setUser(null);
     }
   }, []);
 
-  // Hàm xử lý Đăng xuất
   const handleLogout = () => {
-    localStorage.removeItem('user'); // Xóa trí nhớ
-    setUser(null); // Reset state
-    navigate('/'); // F5 lại trang chủ
+    localStorage.removeItem('user'); 
+    setUser(null); 
+    navigate('/'); 
   };
+
+  // Trích xuất tên an toàn: Ưu tiên full_name -> name -> email -> Nếu thiếu rớt về 'Người dùng'
+  const displayName = user?.full_name || user?.name || user?.email || 'Người dùng';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
       
       <header style={{ backgroundColor: '#ffffff', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
         
-        {/* Hàng 1: Logo và Nút Đăng nhập / Lời chào */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 50px' }}>
           <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
             <span style={{ fontSize: '32px' }}>🦷</span>
@@ -38,13 +44,12 @@ const MainLayout = () => {
             </div>
           </Link>
 
-          {/* HIỂN THỊ CÓ ĐIỀU KIỆN */}
           <div>
             {user ? (
-              // Nếu đã đăng nhập: Hiện lời chào và nút Đăng xuất
               <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                 <span style={{ color: '#2c3e50', fontSize: '16px', fontWeight: '500' }}>
-                  Chào, <strong>{user.full_name}</strong> 👋
+                  {/* Sử dụng displayName thay vì user.full_name cứng */}
+                  Chào, <strong>{displayName}</strong> 👋
                 </span>
                 <button onClick={handleLogout} style={{ 
                   padding: '8px 15px', backgroundColor: '#e74c3c', color: 'white', 
@@ -54,7 +59,6 @@ const MainLayout = () => {
                 </button>
               </div>
             ) : (
-              // Nếu chưa đăng nhập: Hiện nút như cũ
               <Link to="/login">
                 <button style={{ 
                   padding: '10px 20px', backgroundColor: primaryColor, color: 'white', 
@@ -67,7 +71,6 @@ const MainLayout = () => {
           </div>
         </div>
 
-        {/* Hàng 2: Thanh Điều Hướng (Nav) */}
         <div style={{ backgroundColor: primaryColor }}> 
           <nav style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '40px', padding: '12px 0' }}>
             <Link to="/" style={{ textDecoration: 'none', color: 'white', fontWeight: 'bold', fontSize: '15px' }}>TRANG CHỦ</Link>
@@ -75,7 +78,6 @@ const MainLayout = () => {
             <Link to="/services" style={{ textDecoration: 'none', color: 'white', fontWeight: 'bold', fontSize: '15px' }}>DỊCH VỤ</Link>
             <Link to="/guide" style={{ textDecoration: 'none', color: 'white', fontWeight: 'bold', fontSize: '15px' }}>HƯỚNG DẪN</Link>
             
-            {/* Nếu là bệnh nhân (role_id = 3) thì hiện thêm nút ĐẶT LỊCH nổi bật */}
             {user && user.role_id === 3 && (
               <Link to="/patient" style={{ 
                 textDecoration: 'none', color: '#f39c12', fontWeight: '900', fontSize: '15px', 
