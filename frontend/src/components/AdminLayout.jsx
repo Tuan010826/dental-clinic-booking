@@ -1,6 +1,18 @@
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
+import { Link } from 'react-router-dom';
+
+// Đoạn code chèn vào trong phần render giao diện menu (Sidebar):
+<div className="sidebar-menu">
+  <Link to="/admin/dashboard" className="menu-item">
+    📊 Tổng quan Admin
+  </Link>
+  
+  <Link to="/admin/schedule" className="menu-item">
+    📅 Quản lý lịch khám
+  </Link>
+</div>
 const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation(); // Dùng để biết đang đứng ở đường dẫn nào nhằm tô sáng menu
