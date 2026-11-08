@@ -8,19 +8,10 @@ import { HomePage, DoctorListPage, ServicesPage, GuidePage, PatientPage } from '
 // === IMPORT CÁC TRANG XÁC THỰC ===
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-
-// === KHUNG GIỮ CHỖ CHO ADMIN & BÁC SĨ (Đồng đội sẽ làm và thay thế sau) ===
-// (Lưu ý: Các hàm dưới đây chỉ là giữ chỗ tạm thời để code không bị lỗi. 
-// Sau này đồng đội của bạn sẽ xóa chúng đi và import các file .jsx thật của họ vào đây)
-const AdminLayout = ({ children }) => (
-  <div style={{ backgroundColor: '#2c3e50', minHeight: '100vh', color: 'white', padding: '20px' }}>
-    <h2 style={{ borderBottom: '1px solid white', paddingBottom: '10px' }}>⚙️ ĐÂY LÀ GIAO DIỆN ADMIN LAYOUT CHUNG</h2>
-    {/* Outlet sẽ được thay thế sau, tạm thời render children */}
-    <div style={{ marginTop: '20px' }}>{children}</div>
-  </div>
-);
-const AdminDashboard = () => <h3>📊 Trang Tổng quan Dashboard (Đồng đội code ở đây)</h3>;
-const DoctorSchedule = () => <h3>📅 Trang Quản lý Lịch Khám (Đồng đội code ở đây)</h3>;
+// === IMPORT CÁC TRANG CỦA ADMIN & BÁC SĨ (THÀNH VIÊN 3) ===
+import AdminLayout from './components/AdminLayout';
+import AdminDashboard from './pages/AdminDashboard';
+import DoctorSchedule from './pages/DoctorSchedule';
 
 
 function App() {
@@ -49,10 +40,10 @@ function App() {
         {/* ======================================= */}
         {/* VÙNG 3: TRANG DÀNH CHO ADMIN & BÁC SĨ */}
         {/* ======================================= */}
-        {/* Đồng đội sẽ cấu hình Outlet trong AdminLayout thật của họ sau */}
-        <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
-        <Route path="/admin/schedule" element={<AdminLayout><DoctorSchedule /></AdminLayout>} />
-
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="schedule" element={<DoctorSchedule />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
