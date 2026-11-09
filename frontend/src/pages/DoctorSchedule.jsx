@@ -1,48 +1,5 @@
 import { useState, useEffect } from 'react';
 
-const FALLBACK_APPOINTMENTS = [
-  {
-    id: 101,
-    patient_name: 'Trần Thị Bích',
-    patient_phone: '0987.654.321',
-    doctor_name: 'BS. Nguyễn Văn An',
-    date: '2026-11-08',
-    time_type: '08:30 - 09:30',
-    reason: 'Khám tổng quát & Lấy cao răng siêu âm',
-    status: 'PENDING'
-  },
-  {
-    id: 102,
-    patient_name: 'Lê Hoàng Nam',
-    patient_phone: '0912.333.444',
-    doctor_name: 'BS. Trần Minh Tuấn',
-    date: '2026-11-08',
-    time_type: '09:30 - 10:30',
-    reason: 'Tư vấn niềng răng mắc cài kim loại',
-    status: 'CONFIRMED'
-  },
-  {
-    id: 103,
-    patient_name: 'Phạm Thu Hà',
-    patient_phone: '0905.111.222',
-    doctor_name: 'BS. Nguyễn Văn An',
-    date: '2026-11-08',
-    time_type: '14:00 - 15:00',
-    reason: 'Bọc răng sứ thẩm mỹ Cercon',
-    status: 'COMPLETED'
-  },
-  {
-    id: 104,
-    patient_name: 'Vũ Đức Đam',
-    patient_phone: '0933.888.999',
-    doctor_name: 'BS. Lê Thu Thủy',
-    date: '2026-11-09',
-    time_type: '10:00 - 11:00',
-    reason: 'Nhổ răng khôn hàm dưới',
-    status: 'CANCELLED'
-  }
-];
-
 const DoctorSchedule = () => {
   const [appointments, setAppointments] = useState([]);
   const [filterStatus, setFilterStatus] = useState('ALL');
@@ -57,56 +14,44 @@ const DoctorSchedule = () => {
         const response = await fetch('http://localhost:3000/api/v1/appointments');
         if (response.ok) {
           const result = await response.json();
-          const realData = result.data || [];
-          if (realData.length > 0) {
-            setAppointments(realData);
-            setIsUsingRealAPI(true);
-            return;
-          }
-        }
-        throw new Error('Dùng dữ liệu mẫu khi DB trống hoặc chưa bật server');
-      } catch (error) {
-        setIsUsingRealAPI(false);
-        const saved = localStorage.getItem('mock_appointments');
-        if (saved) {
-          setAppointments(JSON.parse(saved));
+          // Sử dụng đúng hàm setAppointments
+          setAppointments(result.data || []);
+          setIsUsingRealAPI(true); // Đánh dấu đã kết nối API thật
         } else {
-          localStorage.setItem('mock_appointments', JSON.stringify(FALLBACK_APPOINTMENTS));
-          setAppointments(FALLBACK_APPOINTMENTS);
+          setAppointments([]);
         }
+      } catch (error) {
+        console.error('Lỗi kết nối API lịch hẹn:', error);
+        setAppointments([]);
       }
     };
 
     fetchAppointments();
   }, []);
-
   // 2. Hàm đổi trạng thái lịch hẹn (Gọi API PUT /api/v1/appointments/:id/status)
   const handleStatusChange = async (id, newStatus) => {
-    // Nếu đang kết nối API thật thì gọi PUT lên MySQL
-    if (isUsingRealAPI) {
-      try {
-        const response = await fetch(`http://localhost:3000/api/v1/appointments/${id}/status`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: newStatus })
-        });
-        if (!response.ok) {
-          alert('Cập nhật trạng thái lên Server thất bại!');
-          return;
-        }
-      } catch (error) {
-        console.error('Lỗi khi gọi API cập nhật trạng thái:', error);
+    try {
+      const response = await fetch(`http://localhost:3000/api/v1/appointments/${id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      
+      if (!response.ok) {
+        alert('Cập nhật trạng thái lên Server thất bại!');
+        return;
       }
+
+      // Nếu API thành công, chỉ cập nhật state nội bộ của React (không dùng localStorage)
+      const updatedList = appointments.map((apt) =>
+        apt.id === id ? { ...apt, status: newStatus } : apt
+      );
+      setAppointments(updatedList);
+    } catch (error) {
+      console.error('Lỗi khi gọi API cập nhật trạng thái:', error);
+      alert('Không thể kết nối với máy chủ!');
     }
-
-    // Cập nhật ngay trên giao diện và lưu đồng bộ vào localStorage
-    const updatedList = appointments.map((apt) =>
-      apt.id === id ? { ...apt, status: newStatus } : apt
-    );
-    setAppointments(updatedList);
-    localStorage.setItem('mock_appointments', JSON.stringify(updatedList));
   };
-
   // 3. Lọc danh sách theo Tab trạng thái, Ô tìm kiếm và Ngày khám
   const filteredAppointments = appointments.filter((apt) => {
     const matchStatus = filterStatus === 'ALL' || apt.status === filterStatus;

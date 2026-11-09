@@ -1,50 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-// Dữ liệu lịch hẹn mẫu (Dùng khi Backend chưa viết xong API /api/v1/appointments)
-const FALLBACK_APPOINTMENTS = [
-  {
-    id: 101,
-    patient_name: 'Trần Thị Bích',
-    patient_phone: '0987.654.321',
-    doctor_name: 'BS. Nguyễn Văn An',
-    date: '2026-11-08',
-    time_type: '08:30 - 09:30',
-    reason: 'Khám tổng quát & Lấy cao răng siêu âm',
-    status: 'PENDING'
-  },
-  {
-    id: 102,
-    patient_name: 'Lê Hoàng Nam',
-    patient_phone: '0912.333.444',
-    doctor_name: 'BS. Trần Minh Tuấn',
-    date: '2026-11-08',
-    time_type: '09:30 - 10:30',
-    reason: 'Tư vấn niềng răng mắc cài kim loại',
-    status: 'CONFIRMED'
-  },
-  {
-    id: 103,
-    patient_name: 'Phạm Thu Hà',
-    patient_phone: '0905.111.222',
-    doctor_name: 'BS. Nguyễn Văn An',
-    date: '2026-11-08',
-    time_type: '14:00 - 15:00',
-    reason: 'Bọc răng sứ thẩm mỹ Cercon',
-    status: 'COMPLETED'
-  },
-  {
-    id: 104,
-    patient_name: 'Vũ Đức Đam',
-    patient_phone: '0933.888.999',
-    doctor_name: 'BS. Lê Thu Thủy',
-    date: '2026-11-09',
-    time_type: '10:00 - 11:00',
-    reason: 'Nhổ răng khôn hàm dưới',
-    status: 'CANCELLED'
-  }
-];
-
 const AdminDashboard = () => {
   // State lưu trữ số liệu thống kê
   const [stats, setStats] = useState({
@@ -61,94 +17,26 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      setLoading(true);
-      let doctorsCount = 3;      // Giá trị mặc định nếu chưa bật DB
-      let patientsCount = 12;
-      let specialtiesCount = 6;
-      let appointmentsData = FALLBACK_APPOINTMENTS;
-
-      // 1. Gọi API lấy danh sách Bác sĩ (API đã có trong userController.js)
-      try {
-        const docRes = await fetch('http://localhost:3000/api/v1/doctors');
-        if (docRes.ok) {
-          const docJson = await docRes.json();
-          const docs = docJson.data || [];
-          if (docs.length > 0) {
-            doctorsCount = docs.length;
-            setDoctorsList(docs);
-          }
-        }
-      } catch (err) {
-        console.warn('Chưa kết nối được API Doctors, dùng số liệu mẫu.');
+  const fetchAppointments = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/v1/appointments');
+      if (response.ok) {
+        const result = await response.json();
+        // Nếu có data thì lấy, không có thì để mảng rỗng
+        setRecentAppointments(result.data || []); 
+      } else {
+        setRecentAppointments([]);
       }
-
-      // 2. Gọi API lấy danh sách Bệnh nhân (roleId = 3 trong userController.js)
-      try {
-        const patRes = await fetch('http://localhost:3000/api/v1/users?roleId=3');
-        if (patRes.ok) {
-          const patJson = await patRes.json();
-          if (patJson.data) patientsCount = patJson.data.length;
-        }
-      } catch (err) {
-        console.warn('Chưa kết nối được API Users, dùng số liệu mẫu.');
-      }
-
-      // 3. Gọi API lấy danh sách Chuyên khoa (API đã có trong specialtyController.js)
-      try {
-        const specRes = await fetch('http://localhost:3000/api/v1/specialties');
-        if (specRes.ok) {
-          const specJson = await specRes.json();
-          if (specJson.data && specJson.data.length > 0) {
-            specialtiesCount = specJson.data.length;
-          }
-        }
-      } catch (err) {
-        console.warn('Chưa kết nối được API Specialties, dùng số liệu mẫu.');
-      }
-
-      // 4. Tự động gọi API thật trước -> Nếu chưa có API hoặc DB trống thì dùng dữ liệu mẫu
-      try {
-        const aptRes = await fetch('http://localhost:3000/api/v1/appointments');
-        if (aptRes.ok) {
-          const aptJson = await aptRes.json();
-          const realData = aptJson.data || aptJson;
-          // Nếu API đã chạy và có dữ liệu trong MySQL thì dùng luôn dữ liệu thật
-          if (Array.isArray(realData) && realData.length > 0) {
-            appointmentsData = realData;
-          } else {
-            throw new Error('Database chưa có lịch hẹn nào, chuyển sang dùng dữ liệu mẫu');
-          }
-        } else {
-          throw new Error('Backend chưa viết API /api/v1/appointments');
-        }
-      } catch (err) {
-        // KHI CHƯA CÓ API: Tự động lấy từ localStorage hoặc FALLBACK_APPOINTMENTS
-        const savedAppointments = localStorage.getItem('mock_appointments');
-        if (savedAppointments) {
-          appointmentsData = JSON.parse(savedAppointments);
-        } else {
-          localStorage.setItem('mock_appointments', JSON.stringify(FALLBACK_APPOINTMENTS));
-          appointmentsData = FALLBACK_APPOINTMENTS;
-        }
-      }
-
-      const pendingCount = appointmentsData.filter(item => item.status === 'PENDING').length;
-
-      setStats({
-        totalDoctors: doctorsCount,
-        totalPatients: patientsCount,
-        totalSpecialties: specialtiesCount,
-        totalAppointments: appointmentsData.length,
-        pendingAppointments: pendingCount
-      });
-
-      setRecentAppointments(appointmentsData.slice(0, 5));
+    } catch (error) {
+      console.error('Lỗi kết nối API lịch hẹn:', error);
+      setRecentAppointments([]);
+    } finally {
       setLoading(false);
-    };
+    }
+  };
 
-    fetchDashboardData();
-  }, []);
+  fetchAppointments();
+}, []);
 
   // Hàm render nhãn trạng thái (Badge) khớp 100% với ENUM trong database.sql
   const renderStatusBadge = (status) => {

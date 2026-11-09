@@ -22,9 +22,9 @@ const MainLayout = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('user'); 
-    setUser(null); 
-    navigate('/'); 
+    localStorage.removeItem('user'); // Xóa trí nhớ
+    // Thêm { replace: true } để xóa dấu vết trang hiện tại khỏi nút Back của trình duyệt
+    navigate('/login', { replace: true }); 
   };
 
   // Trích xuất tên an toàn: Ưu tiên full_name -> name -> email -> Nếu thiếu rớt về 'Người dùng'
@@ -84,6 +84,16 @@ const MainLayout = () => {
                 borderLeft: '2px solid rgba(255,255,255,0.3)', paddingLeft: '40px' 
               }}>
                 📅 ĐẶT LỊCH NGAY
+              </Link>
+            )}
+            {/* THÊM MỚI: Nút dành cho Bác sĩ và Admin */}
+            {user && (user.role_id === 1 || user.role_id === 2) && (
+              <Link to={user.role_id === 1 ? "/admin" : "/admin/schedule"} style={{ 
+                textDecoration: 'none', color: '#fff', backgroundColor: '#e74c3c', 
+                fontWeight: '900', fontSize: '14px', padding: '8px 15px', borderRadius: '5px',
+                marginLeft: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+              }}>
+                ⚙️ KHÔNG GIAN LÀM VIỆC
               </Link>
             )}
           </nav>

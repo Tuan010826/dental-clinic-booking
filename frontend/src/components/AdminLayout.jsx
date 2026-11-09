@@ -1,8 +1,6 @@
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
-
-
 // Đoạn code chèn vào trong phần render giao diện menu (Sidebar):
 <div className="sidebar-menu">
   <Link to="/admin/dashboard" className="menu-item">
@@ -18,7 +16,15 @@ const AdminLayout = () => {
   const location = useLocation(); // Dùng để biết đang đứng ở đường dẫn nào nhằm tô sáng menu
   
   const [user, setUser] = useState(null);
-
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (!user) {
+      // Nếu không có user (đã đăng xuất), đá văng về trang login
+      // Thuộc tính replace: true vô cùng quan trọng: Nó sẽ ghi đè lịch sử duyệt web
+      navigate('/login', { replace: true }); 
+    }
+  }, [navigate]);
+  
   // 1. Đọc thông tin người dùng từ localStorage khi mở trang (giống MainLayout)
   useEffect(() => {
     try {

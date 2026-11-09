@@ -1,7 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-// --- TRANG ĐĂNG KÝ ---
 const RegisterPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -9,15 +8,12 @@ const RegisterPage = () => {
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  
-  // State quản lý việc ẩn/hiện mật khẩu
   const [showPassword, setShowPassword] = useState(false);
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setErrorMessage(''); 
 
-    // Kiểm tra định dạng email và độ dài mật khẩu
     if (!email.includes('@') || !email.endsWith('gmail.com')) {
       setErrorMessage('Vui lòng nhập đúng định dạng email (vd: ...@gmail.com)!');
       setTimeout(() => setErrorMessage(''), 2500);
@@ -47,7 +43,7 @@ const RegisterPage = () => {
     }
   };
 
-return (
+  return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh', backgroundColor: '#f5f7fa', fontFamily: "'Times New Roman', Times, serif" }}>
       <div style={{ backgroundColor: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', width: '100%', maxWidth: '400px' }}>
         
@@ -55,7 +51,6 @@ return (
           Tạo Tài Khoản
         </h2>
 
-        {/* Khung hiển thị thông báo lỗi màu đỏ */}
         {errorMessage && (
           <div style={{ backgroundColor: '#fde8e8', color: '#e74c3c', padding: '12px 15px', borderRadius: '8px', marginBottom: '20px', border: '1px solid #f8b4b4', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span>⚠️</span>
@@ -71,7 +66,7 @@ return (
             <input
               type="text"
               required
-              value={fullName} // Hãy chắc chắn bạn đã khai báo state [fullName, setFullName] ở trên
+              value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Nhập họ và tên..."
               style={{ width: '100%', padding: '12px', borderRadius: '6px', border: '1px solid #cbd5e0', fontSize: '15px', boxSizing: 'border-box' }}
@@ -85,7 +80,7 @@ return (
             <input
               type="text"
               required
-              value={phone} // Hãy chắc chắn bạn đã khai báo state [phone, setPhone] ở trên
+              value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="Nhập số điện thoại..."
               style={{ width: '100%', padding: '12px', borderRadius: '6px', border: '1px solid #cbd5e0', fontSize: '15px', boxSizing: 'border-box' }}
@@ -106,18 +101,27 @@ return (
             />
           </div>
 
+          {/* Ô NHẬP MẬT KHẨU ĐÃ ĐƯỢC BỌC KÍN CÙNG ICON */}
           <div style={{ marginBottom: '25px' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#4a5568' }}>
               Mật khẩu mới
             </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Nhập mật khẩu..."
-              style={{ width: '100%', padding: '12px', borderRadius: '6px', border: '1px solid #cbd5e0', fontSize: '15px', boxSizing: 'border-box' }}
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Nhập mật khẩu..."
+                style={{ width: '100%', padding: '12px', paddingRight: '40px', borderRadius: '6px', border: '1px solid #cbd5e0', fontSize: '15px', boxSizing: 'border-box' }}
+              />
+              <span 
+                onClick={() => setShowPassword(!showPassword)}
+                style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', fontSize: '18px', userSelect: 'none' }}
+              >
+                {showPassword ? "🙈" : "👁️"}
+              </span>
+            </div>
           </div>
 
           <button
@@ -136,4 +140,4 @@ return (
   );
 };
 
-export default RegisterPage
+export default RegisterPage;
