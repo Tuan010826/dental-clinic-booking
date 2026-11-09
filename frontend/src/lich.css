@@ -1,0 +1,238 @@
+/* PatientPage.css */
+.patient-container {
+  background-color: #f4f6f8;
+  padding: 40px 20px;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+.patient-card {
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.patient-title {
+  color: #1a365d;
+  border-bottom: 3px solid #00a887;
+  padding-bottom: 8px;
+  display: inline-block;
+  margin-bottom: 24px;
+  font-size: 20px;
+}
+
+.patient-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.patient-grid-3 {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.patient-group {
+  margin-bottom: 20px;
+}
+
+.patient-label {
+  font-weight: bold;
+  color: #0066cc;
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.patient-label-dark {
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.patient-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.patient-date-group {
+  display: flex;
+  gap: 10px;
+}
+
+.patient-date-btn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.patient-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.patient-submit-btn {
+  background-color: #00a887;
+  color: #fff;
+  padding: 14px 40px;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 168, 135, 0.3);
+}
+.admin-container {
+    max-width: 100%;
+    margin: 30px auto;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.admin-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.admin-header h2 {
+    color: #1a365d;
+    margin-bottom: 5px;
+}
+
+.admin-header p {
+    color: #718096;
+    font-size: 14px;
+}
+
+/* Search bar */
+.search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-bar input {
+    flex: 1;
+    padding: 10px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+}
+
+.search-bar input:focus {
+    border-color: #3182ce;
+}
+
+.search-bar button {
+    padding: 10px 20px;
+    background: #3182ce;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.search-bar .btn-reset {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+/* Table */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.admin-table th, .admin-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #edf2f7;
+    color: #2d3748;
+}
+
+.admin-table th {
+    background-color: #f7fafc;
+    color: #4a5568;
+    font-weight: 600;
+}
+
+/* Badges */
+.badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.badge-pending { 
+    background: #feebc8; 
+    color: #c05621; 
+}
+.badge-confirmed { 
+    background: #ebf8ff; 
+    color: #2b6cb0; 
+}
+.badge-completed { 
+    background: #c6f6d5; 
+    color: #22543d; 
+}
+.badge-cancelled { 
+    background: #fed7d7; 
+    color: #9b2c2c; 
+}
+
+/* Action buttons */
+
+.action-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-action {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-confirm { 
+    background: #3182ce; 
+    color: white; 
+}
+.btn-complete { 
+    background: #38a169; 
+    color: white;
+ }
+.btn-cancel { 
+    background: #e53e3e; 
+    color: white; 
+}

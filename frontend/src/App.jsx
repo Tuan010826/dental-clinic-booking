@@ -3,7 +3,7 @@ import './App.css';
 
 // === IMPORT CÁC TRANG CỦA KHÁCH & BỆNH NHÂN (Bạn đã làm) ===
 import MainLayout from './components/MainLayout';
-import { HomePage, DoctorListPage, ServicesPage, GuidePage, PatientPage } from './pages/StaticPages';
+import { HomePage, DoctorListPage, ServicesPage, GuidePage, PatientPage,HistoryAPpage } from './pages/StaticPages';
 
 // === IMPORT CÁC TRANG XÁC THỰC ===
 import LoginPage from './pages/LoginPage';
@@ -44,6 +44,7 @@ function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="schedule" element={<DoctorSchedule />} />
         </Route>
+        <Route path="/admin/history" element={<AdminLayout><HistoryAPpage /></AdminLayout>} />
       </Routes>
     </BrowserRouter>
   );
