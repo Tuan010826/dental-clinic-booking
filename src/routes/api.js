@@ -16,10 +16,13 @@ const initAPIRoutes = (app) => {
     router.get('/appointments', appointmentController.getAllAppointments);
     router.post('/appointments', appointmentController.createAppointment);
     router.put('/appointments/:id/status', appointmentController.updateAppointmentStatus);
-
+    router.get('/slots', appointmentController.getSlotsStatus);
+    router.post('/book-appointment', appointmentController.bookAppointment);
     // 3. API Bác sĩ (Đã đưa vào trong hàm initAPIRoutes để chạy chuẩn xác)
     router.get('/doctors', userController.getDoctors); 
-    <Route path="/admin/schedule" element={<DoctorSchedule />} />
+     router.get('/admin/appointments', appointmentController.getAdminAppointments); 
+    // Hoặc tên hàm lấy danh sách tương ứng trong controller của bạn
+    router.put('/admin/appointments/:id/status', appointmentController.updateAppointmentStatus); 
     // Tiền tố chung cho tất cả API sẽ là /api/v1
     return app.use('/api/v1', router);
 };
