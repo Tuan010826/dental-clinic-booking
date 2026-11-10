@@ -17,26 +17,50 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  const fetchAppointments = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/api/v1/appointments');
-      if (response.ok) {
-        const result = await response.json();
-        // Nếu có data thì lấy, không có thì để mảng rỗng
-        setRecentAppointments(result.data || []); 
-      } else {
-        setRecentAppointments([]);
-      }
-    } catch (error) {
-      console.error('Lỗi kết nối API lịch hẹn:', error);
-      setRecentAppointments([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const fetchDashboardData = async () => {
+      setLoading(true);
+      try {
+        // Khởi tạo các biến để lấy dữ liệu đồng thời
+        const [aptRes, docRes, patRes, specRes] = await Promise.all([
+          fetch('http://localhost:3000/api/v1/appointments'),
+          fetch('http://localhost:3000/api/v1/doctors'),
+          fetch('http://localhost:3000/api/v1/users?roleId=3'),
+          fetch('http://localhost:3000/api/v1/specialties')
+        ]);
 
-  fetchAppointments();
-}, []);
+        const [aptData, docData, patData, specData] = await Promise.all([
+          aptRes.json(),
+          docRes.json(),
+          patRes.json(),
+          specRes.json()
+        ]);
+
+        const appointments = aptData.data || [];
+        
+        // Tính toán các con số
+        const pendingCount = appointments.filter(item => item.status === 'PENDING').length;
+        
+        setStats({
+          totalAppointments: appointments.length,
+          totalDoctors: (docData.data || docData || []).length, 
+          totalPatients: (patData.data || []).length,
+          totalSpecialties: (specData.data || []).length,
+          pendingAppointments: pendingCount
+        });
+
+        // Chỉ hiển thị 5 lịch hẹn mới nhất
+        setRecentAppointments(appointments.slice(0, 5));
+        setDoctorsList(docData.data || docData || []);
+
+      } catch (error) {
+        console.error("Lỗi khi tải dữ liệu Dashboard:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
 
   // Hàm render nhãn trạng thái (Badge) khớp 100% với ENUM trong database.sql
   const renderStatusBadge = (status) => {

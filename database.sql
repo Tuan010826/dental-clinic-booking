@@ -30,6 +30,7 @@ CREATE TABLE `appointments` (
   `status` enum('PENDING','CONFIRMED','COMPLETED','CANCELLED') COLLATE utf8mb4_unicode_ci DEFAULT 'PENDING',
   `reason` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `clinic_name` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT 'Nha Khoa Smile - Cơ sở Hà Đông',
   PRIMARY KEY (`id`),
   KEY `patient_id` (`patient_id`),
   KEY `doctor_id` (`doctor_id`),
@@ -37,7 +38,7 @@ CREATE TABLE `appointments` (
   CONSTRAINT `appointments_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `appointments_ibfk_2` FOREIGN KEY (`doctor_id`) REFERENCES `doctors` (`id`) ON DELETE CASCADE,
   CONSTRAINT `appointments_ibfk_3` FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -46,6 +47,7 @@ CREATE TABLE `appointments` (
 
 LOCK TABLES `appointments` WRITE;
 /*!40000 ALTER TABLE `appointments` DISABLE KEYS */;
+INSERT INTO `appointments` VALUES (3,16,3,3,'COMPLETED','Bọc răng sứ','2026-11-09 15:50:28','Nha Khoa Smile - Cơ sở Hà Đông');
 /*!40000 ALTER TABLE `appointments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -68,7 +70,7 @@ CREATE TABLE `doctors` (
   KEY `specialty_id` (`specialty_id`),
   CONSTRAINT `doctors_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `doctors_ibfk_2` FOREIGN KEY (`specialty_id`) REFERENCES `specialties` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -77,6 +79,7 @@ CREATE TABLE `doctors` (
 
 LOCK TABLES `doctors` WRITE;
 /*!40000 ALTER TABLE `doctors` DISABLE KEYS */;
+INSERT INTO `doctors` VALUES (1,10,1,'Bác sĩ CKI',350000.00,'Hơn 12 năm kinh nghiệm trong lĩnh vực phục hình răng thẩm mỹ.'),(2,11,2,'Thạc sĩ Bác sĩ',300000.00,'Chuyên gia về niềng răng trong suốt và chỉnh nha trẻ em.'),(3,12,3,'Tiến sĩ Bác sĩ',500000.00,'Tu nghiệp Implant chuyên sâu tại Pháp, thực hiện hơn 1000 ca thành công.'),(4,13,4,'Bác sĩ',250000.00,'Tốt nghiệp ĐH Y Dược TP.HCM, kinh nghiệm 5 năm điều trị nội nha.');
 /*!40000 ALTER TABLE `doctors` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -128,7 +131,7 @@ CREATE TABLE `roles` (
   `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -137,6 +140,7 @@ CREATE TABLE `roles` (
 
 LOCK TABLES `roles` WRITE;
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
+INSERT INTO `roles` VALUES (1,'Admin',NULL),(2,'Doctor',NULL),(3,'Patient',NULL);
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -156,7 +160,7 @@ CREATE TABLE `schedules` (
   PRIMARY KEY (`id`),
   KEY `doctor_id` (`doctor_id`),
   CONSTRAINT `schedules_ibfk_1` FOREIGN KEY (`doctor_id`) REFERENCES `doctors` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -165,6 +169,7 @@ CREATE TABLE `schedules` (
 
 LOCK TABLES `schedules` WRITE;
 /*!40000 ALTER TABLE `schedules` DISABLE KEYS */;
+INSERT INTO `schedules` VALUES (3,3,'2026-11-11','17:00 - 17:30',1);
 /*!40000 ALTER TABLE `schedules` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -182,7 +187,7 @@ CREATE TABLE `specialties` (
   `image_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -191,6 +196,7 @@ CREATE TABLE `specialties` (
 
 LOCK TABLES `specialties` WRITE;
 /*!40000 ALTER TABLE `specialties` DISABLE KEYS */;
+INSERT INTO `specialties` VALUES (1,'Phục hình răng sứ thẩm mỹ','Chuyên bọc sứ, dán sứ Veneer',NULL,'2026-10-20 15:25:18'),(2,'Nha khoa trẻ em & Chỉnh nha','Chuyên niềng răng và chăm sóc răng trẻ em',NULL,'2026-10-20 15:25:18'),(3,'Cấy ghép Implant & Tiểu phẫu','Chuyên trồng răng Implant',NULL,'2026-10-20 15:25:18'),(4,'Điều trị tủy & Nội nha','Chuyên chữa tủy, nhổ răng khôn',NULL,'2026-10-20 15:25:18');
 /*!40000 ALTER TABLE `specialties` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -217,7 +223,7 @@ CREATE TABLE `users` (
   UNIQUE KEY `email` (`email`),
   KEY `role_id` (`role_id`),
   CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -226,6 +232,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,1,'admin@nhakhoasmile.com','$2a$12$0v5.sV6pAskkrPU37e./FeSR/cH6miuxrImiG68PjKQOaI.CLUCnC','Quản Trị Hệ Thống','0888999777','Yên Nghĩa, Hà Đông, Hà Nội','MALE','https://cdn-icons-png.flaticon.com/512/6833/6833601.png','2026-11-09 09:02:28','2026-11-10 05:39:18'),(10,2,'tranvanbinh@nhakhoasmile.com','$2a$12$0GEyvsx/DD/OXuOyxkGYYOkSHo3t/dl8.Pf7EXVd24jHIjmNggSQ.','Trần Văn Bình','0904.511.793','Thanh Xuân, Hà Nội','MALE','https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=300','2026-10-20 15:25:41','2026-11-10 05:41:46'),(11,2,'lananhnguyen@nhakhoasmile.com','$2a$12$uVmtr8VfONnXnxYEl5hWCuIHIJ5y94XvGMF6P.n6SOrF8Hb6UUZAK','Nguyễn Thị Lan Anh','0986.389.696','Cầu Giấy, Hà Nội','FEMALE','https://images.unsplash.com/photo-1594824453531-157d60ce1482?w=300','2026-10-20 15:25:41','2026-11-10 05:41:59'),(12,2,'trongtuanle@nhakhoasmile.com','$2a$12$uHHPWMpIBLBQ1E3xtyu9Jei.F3ho1360i5evKxduKG30NFNWB5nYK','Lê Trọng Tuấn','0938.639.155','Đống Đa, Hà Nội','MALE','https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=300','2026-10-20 15:25:41','2026-11-10 05:41:59'),(13,2,'huongngapham@nhakhoasmile.com','$2a$12$q08grVw6wG/YS7QyhM2Km.GI33cbUKBgtELwhNU72MuBSlmjcnyFK','Phạm Thị Hương Nga','0907.125.062','Hai Bà Trưng, Hà Nội','FEMALE','https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=300','2026-10-20 15:25:41','2026-11-10 05:41:59'),(14,3,'ngoctuan182006@gmail.com','$2b$10$VYkDbIYTtn/o5E6ZpkzNY.jX127bGn4bHKYqMPWFGrQj9.niEqBs6','Tuan','0812839080',NULL,'OTHER',NULL,'2026-11-09 11:38:11','2026-11-10 05:43:18'),(16,3,'0818239080@patient.temp','','Trần Ngọc Tuấn','0818239080',NULL,'MALE',NULL,'2026-11-09 15:50:28','2026-11-09 15:50:28');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -238,4 +245,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-10-06 17:32:20
+-- Dump completed on 2026-11-10 12:55:34

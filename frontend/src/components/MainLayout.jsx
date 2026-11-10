@@ -106,7 +106,7 @@ const MainLayout = () => {
 
       <footer style={{ backgroundColor: primaryColor, color: 'white', textAlign: 'center', padding: '30px 20px', marginTop: 'auto' }}>
         <h3 style={{ marginBottom: '10px' }}>Nha Khoa Smile</h3>
-        <p style={{ margin: '5px 0', fontSize: '14px' }}>Địa chỉ: Yên Nghĩa, Hà Đông, Hà Nội</p>
+        <p style={{ margin: '5px 0', fontSize: '14px' }}>Địa chỉ: Yên Nghĩa, Hà Đông, Hà Nội | Trung Hòa, Cầu Giấy, Hà Nội</p>
         <p style={{ margin: '5px 0', fontSize: '14px' }}>Hotline: 0988.888.888 | Email: contact@nhakhoasmile.com</p>
       </footer>
 
