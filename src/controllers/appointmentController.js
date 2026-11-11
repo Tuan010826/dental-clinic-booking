@@ -18,13 +18,10 @@ const getAllAppointments = async (req, res) => {
             WHERE 1=1
         `;
         const params = [];
-
         if (status && status !== 'ALL') { sql += ' AND a.status = ?'; params.push(status); }
         if (doctorId) { sql += ' AND a.doctor_id = ?'; params.push(doctorId); }
         if (date) { sql += ' AND s.date = ?'; params.push(date); }
-
         sql += ' ORDER BY s.date DESC, a.created_at DESC';
-
         const [rows] = await db.execute(sql, params);
         return res.status(200).json({ success: true, message: 'Thành công', data: rows });
     } catch (error) {
@@ -32,7 +29,6 @@ const getAllAppointments = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Lỗi server' });
     }
 };
-
 // 2. API Cập nhật trạng thái lịch hẹn
 const updateAppointmentStatus = async (req, res) => {
     try {
@@ -55,7 +51,6 @@ const updateAppointmentStatus = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Lỗi server' });
     }
 };
-
 // 3. API Tạo lịch hẹn mới (Tạo bởi Admin/Lễ tân)
 const createAppointment = async (req, res) => {
     try {
@@ -63,10 +58,8 @@ const createAppointment = async (req, res) => {
         if (!patient_id || !doctor_id || !date || !time_type) {
             return res.status(400).json({ success: false, message: 'Điền đủ thông tin!' });
         }
-
         let [schedules] = await db.execute('SELECT id, max_booking FROM schedules WHERE doctor_id = ? AND date = ? AND time_type = ?', [doctor_id, date, time_type]);
         let schedule_id;
-
         if (schedules.length === 0) {
             const [newSched] = await db.execute('INSERT INTO schedules (doctor_id, date, time_type, max_booking) VALUES (?, ?, ?, 1)', [doctor_id, date, time_type]);
             schedule_id = newSched.insertId;
@@ -77,7 +70,6 @@ const createAppointment = async (req, res) => {
                 return res.status(409).json({ success: false, message: 'Khung giờ này đã kín lịch!' });
             }
         }
-
         const [result] = await db.execute(
             'INSERT INTO appointments (patient_id, doctor_id, schedule_id, status, reason) VALUES (?, ?, ?, ?, ?)',
             [patient_id, doctor_id, schedule_id, 'PENDING', reason || 'Khám nha khoa']
@@ -88,7 +80,6 @@ const createAppointment = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Lỗi server' });
     }
 };
-
 // 4. API Lấy danh sách bác sĩ
 const getDoctorsList = async (req, res) => {
     try {
@@ -99,16 +90,13 @@ const getDoctorsList = async (req, res) => {
         return res.status(500).json({ message: "Lỗi server" });
     }
 };
-
 // 5. API Kiểm tra trạng thái Slot giờ khám
 const getSlotsStatus = async (req, res) => {
     const { date, doctor_id } = req.query;
     const timeSlots = ['08:00 - 08:30', '08:30 - 09:00', '09:00 - 09:30', '09:30 - 10:00', '14:00 - 14:30', '14:30 - 15:00', '17:00 - 17:30', '18:00 - 18:30'];
-
     try {
         const [doctors] = await db.execute('SELECT id FROM doctors');
         let resultSlots = [];
-
         for (let time of timeSlots) {
             let isFull = false;
             if (doctor_id && doctor_id !== '') {
@@ -136,21 +124,17 @@ const getSlotsStatus = async (req, res) => {
         return res.status(500).json({ message: "Lỗi server" });
     }
 };
-
-// 6. API Xử lý Form đặt lịch khách hàng (Đã sửa Bug role_id)
+// 6. API Xử lý Form đặt lịch khách hàng
 const bookAppointment = async (req, res) => {
     const { clinic, service, doctor_id, date, timeSlot, fullName, gender, dob, phone, email, reason } = req.body;
-
     try {
         const [doctors] = await db.execute('SELECT id FROM doctors');
         let assignedDoctorId = doctor_id;
-
         if (doctor_id && doctor_id !== '') {
             const [existing] = await db.execute(`
                 SELECT a.* FROM appointments a JOIN schedules s ON a.schedule_id = s.id 
                 WHERE s.date = ? AND s.time_type = ? AND s.doctor_id = ? AND a.status != 'Hủy'
             `, [date, timeSlot, doctor_id]);
-
             if (existing.length > 0) return res.status(400).json({ success: false, message: 'Ca khám này đã kín!' });
         } else {
             let foundDocId = null;
@@ -164,14 +148,12 @@ const bookAppointment = async (req, res) => {
             if (!foundDocId) return res.status(400).json({ success: false, message: 'Tất cả bác sĩ đã kín lịch!' });
             assignedDoctorId = foundDocId;
         }
-
         let patientId = null;
         let userExist = [];
         if (phone) {
             const [rows] = await db.execute('SELECT id FROM users WHERE phone = ?', [phone]);
             userExist = rows;
         }
-
         const dbGender = gender === 'Nam' ? 'MALE' : (gender === 'Nữ' ? 'FEMALE' : 'OTHER');
         const patientEmail = (email && email.trim() !== '') ? email : `${phone || 'guest'}@patient.temp`;
 
@@ -186,20 +168,17 @@ const bookAppointment = async (req, res) => {
             );
             patientId = newUser.insertId;
         }
-
         const scheduleId = await getOrCreateScheduleId(date, timeSlot, assignedDoctorId);
         await db.execute(`
             INSERT INTO appointments (patient_id, doctor_id, schedule_id, status, reason) 
             VALUES (?, ?, ?, 'PENDING', ?)
         `, [patientId, assignedDoctorId, scheduleId, reason || service]);
-
         return res.status(200).json({ success: true, message: 'Đặt lịch thành công!' });
     } catch (error) {
         console.error("Lỗi đặt lịch:", error);
         return res.status(500).json({ success: false, message: 'Lỗi server.' });
     }
 };
-
 // 7. Hàm Helper lấy hoặc tạo Schedule
 async function getOrCreateScheduleId(date, time_type, doctor_id) {
     const [rows] = await db.execute('SELECT id FROM schedules WHERE date = ? AND time_type = ? AND doctor_id = ?', [date, time_type, doctor_id]);
@@ -208,7 +187,6 @@ async function getOrCreateScheduleId(date, time_type, doctor_id) {
     const [result] = await db.execute('INSERT INTO schedules (doctor_id, date, time_type, max_booking) VALUES (?, ?, ?, 1)', [doctor_id, date, time_type]);
     return result.insertId;
 }
-
 // 8. API Admin Search
 const getAdminAppointments = async (req, res) => {
     const { search } = req.query;
@@ -231,12 +209,40 @@ const getAdminAppointments = async (req, res) => {
             params = [search.trim(), pattern, pattern];
         }
         query += ` ORDER BY s.date DESC, s.time_type DESC`;
-        
         const [rows] = await db.execute(query, params);
         return res.status(200).json({ success: true, data: rows });
     } catch (error) {
         console.error("Lỗi lấy danh sách Admin:", error);
         return res.status(500).json({ success: false, message: "Lỗi server" });
+    }
+};
+// 9.Lấy lịch sử khám của một bệnh nhân cụ thể
+const getPatientAppointments = async (req, res) => {
+    try {
+        const patientId = req.params.patientId; // Lấy ID bệnh nhân từ URL
+        const query = `
+            SELECT 
+                a.id AS appointment_id,
+                DATE_FORMAT(s.date, '%d/%m/%Y') AS appointment_date,
+                s.time_type AS appointment_time,
+                u_doctor.full_name AS doctor_name,
+                a.reason, 
+                a.status
+            FROM appointments a
+            JOIN schedules s ON a.schedule_id = s.id
+            JOIN doctors d ON a.doctor_id = d.id
+            JOIN users u_doctor ON d.user_id = u_doctor.id
+            WHERE a.patient_id = ?
+            ORDER BY s.date DESC;
+        `;
+        const [rows] = await db.execute(query, [patientId]);
+        res.status(200).json({
+            success: true,
+            data: rows
+        });
+    } catch (error) {
+        console.error("Lỗi lấy lịch sử bệnh nhân:", error);
+        res.status(500).json({ success: false, message: 'Lỗi server khi lấy lịch sử khám' });
     }
 };
 
@@ -250,4 +256,5 @@ module.exports = {
     getSlotsStatus,
     getOrCreateScheduleId,
     getAdminAppointments,
+    getPatientAppointments 
 };

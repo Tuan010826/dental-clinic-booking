@@ -4,7 +4,6 @@ import './App.css';
 // === IMPORT CÁC TRANG CỦA KHÁCH & BỆNH NHÂN (Bạn đã làm) ===
 import MainLayout from './components/MainLayout';
 import { HomePage, DoctorListPage, ServicesPage, GuidePage, PatientPage,HistoryAPpage } from './pages/StaticPages';
-
 // === IMPORT CÁC TRANG XÁC THỰC ===
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -13,12 +12,10 @@ import AdminLayout from './components/AdminLayout';
 import AdminDashboard from './pages/AdminDashboard';
 import DoctorSchedule from './pages/DoctorSchedule';
 
-
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        
         {/* ======================================= */}
         {/* VÙNG 1: TRANG DÀNH CHO KHÁCH VÀ BỆNH NHÂN */}
         {/* ======================================= */}
@@ -30,13 +27,11 @@ function App() {
           {/* Trang của Bệnh nhân nằm chung Layout với Khách để xài chung Nav/Footer */}
           <Route path="/patient" element={<PatientPage />} />
         </Route>
-
         {/* ======================================= */}
         {/* VÙNG 2: TRANG ĐỘC LẬP (KHÔNG CÓ HEADER/FOOTER) */}
         {/* ======================================= */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-
         {/* ======================================= */}
         {/* VÙNG 3: TRANG DÀNH CHO ADMIN & BÁC SĨ */}
         {/* ======================================= */}

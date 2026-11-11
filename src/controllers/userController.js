@@ -3,17 +3,13 @@ const { pool } = require('../config/connectDB');
 const getAllUsers = async (req, res) => {
     try {
         const roleId = req.query.roleId; 
-        
         let query = 'SELECT id, email, full_name, phone, role_id FROM users';
         let queryParams = [];
-
         if (roleId) {
             query += ' WHERE role_id = ?';
             queryParams.push(roleId);
         }
-
         const [users] = await pool.query(query, queryParams);
-
         return res.status(200).json({
             message: 'Lấy danh sách người dùng thành công',
             data: users
@@ -42,10 +38,8 @@ const getDoctors = async (req, res) => {
             JOIN users u ON d.user_id = u.id
             LEFT JOIN specialties s ON d.specialty_id = s.id
         `;
-
         // Dùng chuẩn await pool.query giống hệt như hàm getAllUsers bên trên
         const [results] = await pool.query(sql);
-
         return res.status(200).json({ 
             success: true, 
             data: results 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { MyHistory } from '../components/History';
 import '../lich.css';
 const primaryColor = '#2980b9'; 
 
@@ -11,7 +12,6 @@ export const HomePage = () => {
   const user = localStorage.getItem('user');
   // Nếu có user -> đi tới /patient. Nếu không -> đi tới /login
   const bookingLink = user ? '/patient' : '/login';
-
   return (
     <div>
       {/* HERO BANNER */}
@@ -27,7 +27,6 @@ export const HomePage = () => {
           </button>
         </Link>
       </section>
-
       {/* DỊCH VỤ NỔI BẬT */}
       <section style={{ padding: '60px 20px', maxWidth: '1000px', margin: '0 auto', textAlign: 'center' }}>
         <h2 style={{ color: primaryColor, fontSize: '32px', marginBottom: '40px' }}>Dịch Vụ Của Chúng Tôi</h2>
@@ -388,7 +387,6 @@ export const HistoryAPpage= ()=> {
     );
 };
 
-
 //form đặt lịch khám//
 
 export const PatientPage = () => {
@@ -442,9 +440,7 @@ export const PatientPage = () => {
     };
     fetchSlots();
   }, [formData.date, formData.doctor_id]);
-
   
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -666,6 +662,7 @@ export const PatientPage = () => {
           </div>
         </form>
       </div>
+      <MyHistory />
     </div>
   );
 };
